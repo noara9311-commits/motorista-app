@@ -191,13 +191,15 @@ function AuthScreen({onLogin}){
     catch(e){setErro("Email ou senha incorretos.");}
     setLoad(false);
   }
+  const[showSenha,setShowSenha]=useState(false);
+  const[showSenha2,setShowSenha2]=useState(false);
   const[aceite,setAceite]=useState(false);
   async function handleSignup(){
     if(!nome||!email||!senha)return setErro("Preencha todos os campos.");
     if(senha.length<6)return setErro("Senha mínimo 6 caracteres.");
     if(!aceite)return setErro("Você precisa aceitar os Termos de Uso e a Política de Privacidade.");
     setLoad(true);setErro("");
-    try{await sbAuth("signup",{email,password:senha,data:{nome}});setOk("Conta criada! Confirme seu email e faça login.");setMode("login");}
+    try{await sbAuth("signup",{email,password:senha,data:{nome}});setOk("✅ Conta criada com sucesso! Enviamos um email de confirmação para "+email+". Confirme seu acesso e depois faça login aqui.");setMode("login");}
     catch(e){setErro(e.message);}
     setLoad(false);
   }
@@ -234,7 +236,12 @@ function AuthScreen({onLogin}){
       <div style={{fontSize:22,fontWeight:800,color:"#f8fafc",textAlign:"center",marginBottom:20}}>Entrar</div>
       {ok&&<div style={A.msgOk}>{ok}</div>}{erro&&<div style={A.msgErr}>{erro}</div>}
       <FR l="Email"><input style={A.inp} type="email" placeholder="seu@email.com" value={email} onChange={e=>setEmail(e.target.value)}/></FR>
-      {!reset&&<FR l="Senha"><input style={A.inp} type="password" placeholder="••••••" value={senha} onChange={e=>setSenha(e.target.value)} onKeyDown={e=>e.key==="Enter"&&handleLogin()}/></FR>}
+      {!reset&&<FR l="Senha">
+        <div style={{position:"relative"}}>
+          <input style={{...A.inp,paddingRight:44}} type={showSenha?"text":"password"} placeholder="••••••" value={senha} onChange={e=>setSenha(e.target.value)} onKeyDown={e=>e.key==="Enter"&&handleLogin()}/>
+          <button onClick={()=>setShowSenha(!showSenha)} style={{position:"absolute",right:12,top:"50%",transform:"translateY(-50%)",background:"none",border:"none",color:"#64748b",cursor:"pointer",fontSize:16,padding:0}}>{showSenha?"🙈":"👁️"}</button>
+        </div>
+      </FR>}
       {!reset
         ?<><button style={{...A.btnP,opacity:loading?0.7:1}} onClick={handleLogin} disabled={loading}>{loading?"Entrando...":"Entrar"}</button><div style={{textAlign:"center",fontSize:13,color:"#64748b",cursor:"pointer",marginTop:10}} onClick={()=>{setReset(true);setErro("");}}>Esqueci minha senha</div></>
         :<><div style={{fontSize:13,color:"#94a3b8",marginBottom:12}}>Digite seu email acima e clique enviar.</div><button style={{...A.btnP,opacity:loading?0.7:1}} onClick={handleReset} disabled={loading}>{loading?"Enviando...":"Enviar link de recuperação"}</button><div style={{textAlign:"center",fontSize:13,color:"#64748b",cursor:"pointer",marginTop:10}} onClick={()=>{setReset(false);setErro("");}}>Voltar ao login</div></>
@@ -251,7 +258,12 @@ function AuthScreen({onLogin}){
       {erro&&<div style={A.msgErr}>{erro}</div>}
       <FR l="Seu nome"><input style={A.inp} placeholder="Ex: João Silva" value={nome} onChange={e=>setNome(e.target.value)}/></FR>
       <FR l="Email"><input style={A.inp} type="email" placeholder="seu@email.com" value={email} onChange={e=>setEmail(e.target.value)}/></FR>
-      <FR l="Senha"><input style={A.inp} type="password" placeholder="Mínimo 6 caracteres" value={senha} onChange={e=>setSenha(e.target.value)}/></FR>
+      <FR l="Senha">
+        <div style={{position:"relative"}}>
+          <input style={{...A.inp,paddingRight:44}} type={showSenha2?"text":"password"} placeholder="Mínimo 6 caracteres" value={senha} onChange={e=>setSenha(e.target.value)}/>
+          <button onClick={()=>setShowSenha2(!showSenha2)} style={{position:"absolute",right:12,top:"50%",transform:"translateY(-50%)",background:"none",border:"none",color:"#64748b",cursor:"pointer",fontSize:16,padding:0}}>{showSenha2?"🙈":"👁️"}</button>
+        </div>
+      </FR>
       <div style={{display:"flex",alignItems:"flex-start",gap:10,background:"#1e293b",borderRadius:10,padding:"12px 14px",border:`1.5px solid ${aceite?"#22c55e44":"#334155"}`,marginBottom:14,cursor:"pointer"}} onClick={()=>setAceite(!aceite)}>
         <div style={{width:18,height:18,borderRadius:4,border:`2px solid ${aceite?"#22c55e":"#475569"}`,background:aceite?"#22c55e":"transparent",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,marginTop:1}}>
           {aceite&&<span style={{fontSize:11,color:"#000",fontWeight:900}}>✓</span>}
@@ -558,8 +570,8 @@ export default function MotoristaApp(){
       </div>
 
       {acesso.status==="demo"&&acesso.daysLeft<=1&&<div style={{background:"linear-gradient(90deg,#7f1d1d,#991b1b)",padding:"8px 16px",fontSize:12,color:"#fca5a5",textAlign:"center",fontWeight:600}}>⚠️ Último dia do demo! <span style={{textDecoration:"underline",cursor:"pointer"}} onClick={()=>window.open("/","_self")}>Criar conta grátis</span></div>}
-      {acesso.status==="trial"&&acesso.daysLeft<=5&&<div style={{background:"linear-gradient(90deg,#92400e,#78350f)",padding:"8px 16px",fontSize:12,color:"#fcd34d",textAlign:"center",fontWeight:600}}>⚠️ Teste termina em {acesso.daysLeft} dia{acesso.daysLeft!==1?"s":""} · <span style={{textDecoration:"underline",cursor:"pointer"}} onClick={()=>window.open("https://app.cakto.com.br/SEU_LINK_MENSAL","_blank")}>Ver planos a partir de R$9,99/mês</span></div>}
-      {acesso.status==="trial"&&acesso.daysLeft>5&&<div style={{background:"#1e293b",padding:"5px 16px",fontSize:11,color:"#64748b",textAlign:"center",borderBottom:"1px solid #334155"}}>🎁 {acesso.daysLeft} dias de teste restantes · Planos a partir de R$9,99/mês</div>}
+      {acesso.status==="trial"&&acesso.daysLeft<=5&&<div style={{background:"linear-gradient(90deg,#92400e,#78350f)",padding:"8px 16px",fontSize:12,color:"#fcd34d",textAlign:"center",fontWeight:600}}>⚠️ Teste termina em {acesso.daysLeft} dia{acesso.daysLeft!==1?"s":""} · <span style={{textDecoration:"underline",cursor:"pointer"}} onClick={()=>window.open("https://app.cakto.com.br/SEU_LINK_MENSAL","_blank")}>Assinar por R$12,90/mês</span></div>}
+      {acesso.status==="trial"&&acesso.daysLeft>5&&<div style={{background:"#1e293b",padding:"5px 16px",fontSize:11,color:"#64748b",textAlign:"center",borderBottom:"1px solid #334155"}}>🎁 {acesso.daysLeft} dias de teste restantes · Assine por R$12,90/mês</div>}
 
       <div style={S.content}>
 
