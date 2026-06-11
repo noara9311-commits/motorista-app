@@ -461,8 +461,24 @@ export default function MotoristaApp(){
   },[token]);
 
   async function loadSupabase(){
-    try{const r=await sbFetch(`/motorista_dados?user_id=eq.${user.id}&select=dados`,{_token:token});if(r&&r.length>0){setAppData(JSON.parse(r[0].dados));if(!localStorage.getItem("moto_onboarded"))setShowOnboarding(true);}else{setAppData(defaultData());setShowOnboarding(true);}}
-    catch{setAppData(defaultData());setShowOnboarding(true);}
+    try{
+      // Tenta com user.id (UUID)
+      const r=await sbFetch(`/motorista_dados?user_id=eq.${user.id}&select=dados`,{_token:token});
+      if(r&&r.length>0){
+        setAppData(JSON.parse(r[0].dados));
+        if(!localStorage.getItem("moto_onboarded"))setShowOnboarding(true);
+      } else {
+        // Tenta com email como fallback
+        const r2=await sbFetch(`/motorista_dados?user_id=eq.${encodeURIComponent(user.email)}&select=dados`,{_token:token});
+        if(r2&&r2.length>0){setAppData(JSON.parse(r2[0].dados));if(!localStorage.getItem("moto_onboarded"))setShowOnboarding(true);}
+        else{setAppData(defaultData());setShowOnboarding(true);}
+      }
+    } catch(e){
+      console.error("loadSupabase error:",e);
+      // Tenta carregar do cache offline
+      try{const cache=localStorage.getItem("moto_offline_cache");if(cache){setAppData(JSON.parse(cache));return;}}catch{}
+      setAppData(defaultData());setShowOnboarding(true);
+    }
   }
   async function loadAss(){
     try{const r=await sbFetch(`/assinaturas?email=eq.${encodeURIComponent(user.email)}&select=status,trial_end,assinatura_end`,{_token:token});
@@ -482,8 +498,29 @@ export default function MotoristaApp(){
   async function saveData(nd){
     setAppData(nd);
     if(DEMO){localStorage.setItem("moto_demo",JSON.stringify(nd));return;}
-    if(!online){localStorage.setItem("moto_offline_cache",JSON.stringify(nd));return;}
-    try{await sbFetch("/motorista_dados",{method:"POST",_token:token,headers:{Prefer:"resolution=merge-duplicates"},body:JSON.stringify({user_id:user.id,dados:JSON.stringify(nd)})});}catch{}
+    // Salva sempre no cache local primeiro
+    localStorage.setItem("moto_offline_cache",JSON.stringify(nd));
+    if(!online){return;}
+    try{
+      // Usa o UUID do usuário como user_id
+      await sbFetch("/motorista_dados",{
+        method:"POST",
+        _token:token,
+        headers:{Prefer:"resolution=merge-duplicates"},
+        body:JSON.stringify({user_id:user.id,dados:JSON.stringify(nd)})
+      });
+    } catch(e){
+      console.error("saveData error:",e);
+      // Tenta com email como fallback
+      try{
+        await sbFetch("/motorista_dados",{
+          method:"POST",
+          _token:token,
+          headers:{Prefer:"resolution=merge-duplicates"},
+          body:JSON.stringify({user_id:user.email,dados:JSON.stringify(nd)})
+        });
+      } catch(e2){console.error("saveData fallback error:",e2);}
+    }
   }
 
   function flash(){setSaved(true);setTimeout(()=>setSaved(false),2000);}
@@ -902,3 +939,9 @@ const S={
   navBtn:{flex:1,background:"none",border:"none",padding:"8px 0 6px",cursor:"pointer",display:"flex",flexDirection:"column",alignItems:"center",gap:2},
   navActive:{background:"#0f172a"},navLbl:{fontSize:9,color:"#64748b",fontWeight:600},
 };
+
+        
+    
+     
+         
+        
