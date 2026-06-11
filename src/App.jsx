@@ -758,9 +758,9 @@ export default function MotoristaApp(){
                 🌐 <a href="https://motoristaaapp.com.br" target="_blank" style={{color:"#3b82f6"}}>motoristaaapp.com.br</a>
               </div>
             </div>
-            <button style={{width:"100%",background:"#1e293b",border:"1px solid #334155",borderRadius:9,padding:"11px",color:"#25d366",fontSize:13,fontWeight:600,cursor:"pointer",marginBottom:8,display:"flex",alignItems:"center",justifyContent:"center",gap:8}}
-
-            </button>
+            <a href="mailto:contato.motoristaaapp@gmail.com" style={{display:"flex",alignItems:"center",justifyContent:"center",gap:8,background:"linear-gradient(135deg,#065f46,#047857)",border:"none",borderRadius:9,padding:"12px",color:"#fff",fontSize:13,fontWeight:700,cursor:"pointer",marginBottom:8,textDecoration:"none",width:"100%",boxSizing:"border-box"}}>
+              📧 Enviar email de suporte
+            </a>
             <div style={{display:"flex",gap:8}}>
               <a href="/politica-privacidade.html" target="_blank" style={{flex:1,textAlign:"center",fontSize:11,color:"#475569",textDecoration:"none",padding:"8px",background:"#0f172a",borderRadius:8,border:"1px solid #334155"}}>📄 Privacidade</a>
               <a href="/termos-de-uso.html" target="_blank" style={{flex:1,textAlign:"center",fontSize:11,color:"#475569",textDecoration:"none",padding:"8px",background:"#0f172a",borderRadius:8,border:"1px solid #334155"}}>📋 Termos</a>
