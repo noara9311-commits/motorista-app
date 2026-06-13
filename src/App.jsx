@@ -1,18 +1,29 @@
 import { useState, useEffect } from "react";
 
 const SUPABASE_URL = "https://crlcqtfejjewxisriksi.supabase.co";
-const SUPABASE_KEY = "sb_publishable_-GHLYHf7u4bv3uD8hDwE9Q_43M6ucoK";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNybGNxdGZlampld3hpc3Jpa3NpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAxNzg4MzgsImV4cCI6MjA5NTc1NDgzOH0.sS3g_ur-dBvMLixFYcrYZ1KVIReZ-eNHf8a5zroeXy4";
 const LOCAL_KEY    = "motorista_session_v8";
 const DEMO_KEY     = "motorista_demo_start";
 const DEMO_DAYS    = 3;
 
 async function sbFetch(path, opts = {}) {
+  const token = opts._token || SUPABASE_KEY;
   const res = await fetch(`${SUPABASE_URL}/rest/v1${path}`, {
     ...opts,
-    headers: { "Content-Type":"application/json", apikey:SUPABASE_KEY, Authorization:`Bearer ${opts._token||SUPABASE_KEY}`, Prefer:"return=representation", ...(opts.headers||{}) },
+    headers: {
+      "Content-Type": "application/json",
+      "apikey": SUPABASE_KEY,
+      "Authorization": `Bearer ${token}`,
+      "Prefer": opts.headers?.Prefer || "return=representation",
+      ...(opts.headers || {}),
+    },
   });
-  if (!res.ok) { const e = await res.json().catch(()=>({})); throw new Error(e.message||res.statusText); }
-  return res.status===204 ? null : res.json();
+  if (!res.ok) {
+    const e = await res.json().catch(() => ({}));
+    console.error("sbFetch error:", path, e);
+    throw new Error(e.message || e.error || res.statusText);
+  }
+  return res.status === 204 ? null : res.json();
 }
 async function sbAuth(endpoint, body) {
   const res = await fetch(`${SUPABASE_URL}/auth/v1/${endpoint}`, { method:"POST", headers:{"Content-Type":"application/json",apikey:SUPABASE_KEY}, body:JSON.stringify(body) });
@@ -939,9 +950,3 @@ const S={
   navBtn:{flex:1,background:"none",border:"none",padding:"8px 0 6px",cursor:"pointer",display:"flex",flexDirection:"column",alignItems:"center",gap:2},
   navActive:{background:"#0f172a"},navLbl:{fontSize:9,color:"#64748b",fontWeight:600},
 };
-
-        
-    
-     
-         
-        
