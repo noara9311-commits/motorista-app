@@ -25,10 +25,34 @@ async function sbFetch(path, opts = {}) {
   }
   return res.status === 204 ? null : res.json();
 }
+
+async function sbRefreshToken(refreshToken) {
+  try {
+    const res = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=refresh_token`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "apikey": SUPABASE_KEY },
+      body: JSON.stringify({ refresh_token: refreshToken }),
+    });
+    const data = await res.json();
+    if (data.access_token) {
+      const session = JSON.parse(localStorage.getItem(LOCAL_KEY) || "{}");
+      session.token = data.access_token;
+      session.refresh_token = data.refresh_token;
+      localStorage.setItem(LOCAL_KEY, JSON.stringify(session));
+      return data.access_token;
+    }
+  } catch(e) { console.error("Refresh token error:", e); }
+  return null;
+}
+
 async function sbAuth(endpoint, body) {
-  const res = await fetch(`${SUPABASE_URL}/auth/v1/${endpoint}`, { method:"POST", headers:{"Content-Type":"application/json",apikey:SUPABASE_KEY}, body:JSON.stringify(body) });
+  const res = await fetch(`${SUPABASE_URL}/auth/v1/${endpoint}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "apikey": SUPABASE_KEY },
+    body: JSON.stringify(body)
+  });
   const data = await res.json();
-  if (!res.ok) throw new Error(data.error_description||data.msg||"Erro");
+  if (!res.ok) throw new Error(data.error_description || data.msg || "Erro");
   return data;
 }
 
@@ -198,7 +222,15 @@ function AuthScreen({onLogin}){
   async function handleLogin(){
     if(!email||!senha)return setErro("Preencha email e senha.");
     setLoad(true);setErro("");
-    try{const data=await sbAuth("token?grant_type=password",{email,password:senha});localStorage.setItem(LOCAL_KEY,JSON.stringify({token:data.access_token,user:data.user}));onLogin(data.access_token,data.user);}
+    try{
+      const data=await sbAuth("token?grant_type=password",{email,password:senha});
+      localStorage.setItem(LOCAL_KEY,JSON.stringify({
+        token:data.access_token,
+        refresh_token:data.refresh_token,
+        user:data.user
+      }));
+      onLogin(data.access_token,data.user,data.refresh_token);
+    }
     catch(e){setErro("Email ou senha incorretos.");}
     setLoad(false);
   }
@@ -221,7 +253,7 @@ function AuthScreen({onLogin}){
     catch(e){setErro("Erro ao enviar email.");}
     setLoad(false);
   }
-  function startDemo(){if(!localStorage.getItem(DEMO_KEY))localStorage.setItem(DEMO_KEY,Date.now().toString());onLogin("DEMO",{id:"demo",email:"demo@app.com",user_metadata:{nome:"Motorista"}});}
+  function startDemo(){if(!localStorage.getItem(DEMO_KEY))localStorage.setItem(DEMO_KEY,Date.now().toString());onLogin("DEMO",{id:"demo",email:"demo@app.com",user_metadata:{nome:"Motorista"}},null);}
 
   if(mode==="welcome")return(
     <div style={A.root}><div style={A.splash}>
@@ -439,7 +471,9 @@ function BloqueioScreen({onLogout,tipo}){
 
 // ══ APP PRINCIPAL ══
 export default function MotoristaApp(){
-  const[token,setToken]=useState(null);const[user,setUser]=useState(null);
+  const[token,setToken]=useState(null);
+  const[refreshToken,setRefreshToken]=useState(null);
+  const[user,setUser]=useState(null);
   const[appData,setAppData]=useState(null);const[assinatura,setAss]=useState(null);
   const[tab,setTab]=useState(0);const[saved,setSaved]=useState(false);
   const[mesSel,setMesSel]=useState(getMes(0));const[diaAberto,setDiaAberto]=useState(null);
@@ -462,8 +496,28 @@ export default function MotoristaApp(){
   },[]);
 
   useEffect(()=>{
-    try{const s=localStorage.getItem(LOCAL_KEY);if(s){const{token:t,user:u}=JSON.parse(s);if(t&&u){setToken(t);setUser(u);}}}catch{}
+    try{
+      const s=localStorage.getItem(LOCAL_KEY);
+      if(s){
+        const{token:t,user:u,refresh_token:rt}=JSON.parse(s);
+        if(t&&u){setToken(t);setUser(u);if(rt)setRefreshToken(rt);}
+      }
+    }catch{}
   },[]);
+
+  // ── auto refresh token a cada 50 minutos ──
+  useEffect(()=>{
+    if(!refreshToken||DEMO)return;
+    // Renova imediatamente ao carregar para garantir token válido
+    sbRefreshToken(refreshToken).then(newToken=>{
+      if(newToken)setToken(newToken);
+    });
+    const interval=setInterval(async()=>{
+      const newToken=await sbRefreshToken(refreshToken);
+      if(newToken)setToken(newToken);
+    },50*60*1000);
+    return()=>clearInterval(interval);
+  },[refreshToken]);
 
   useEffect(()=>{
     if(!token||!user)return;
@@ -545,7 +599,7 @@ export default function MotoristaApp(){
 
   if(!token||!user)return(
     <>
-      <AuthScreen onLogin={(t,u)=>{setToken(t);setUser(u);}}/>
+      <AuthScreen onLogin={(t,u,rt)=>{setToken(t);setUser(u);if(rt)setRefreshToken(rt);}}/>
       {!cookieOk&&<CookieBanner onAccept={()=>{localStorage.setItem("cookie_consent","1");setCookieOk(true);}}/>}
     </>
   );;
