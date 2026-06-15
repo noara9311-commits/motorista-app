@@ -662,7 +662,17 @@ export default function MotoristaApp(){
     <div style={S.root}>
       <div style={S.header}>
         <div style={S.hInner}>
-          <div style={S.logo}><span style={{fontSize:22}}>🚘</span><div><div style={S.logoT}>MotoristaApp</div><div style={S.logoS}>Olá, {nomeUser}! {DEMO&&<span style={{background:"#f59e0b",color:"#000",fontSize:9,fontWeight:700,padding:"1px 6px",borderRadius:99}}>DEMO</span>}</div></div></div>
+          <div style={S.logo}>
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+              <rect width="32" height="32" rx="8" fill="#065f46"/>
+              <rect x="6" y="18" width="20" height="7" rx="3" fill="#34d399"/>
+              <path d="M9 18 L11.5 12 L20.5 12 L23 18 Z" fill="#34d399" opacity="0.9"/>
+              <circle cx="10" cy="25" r="2.5" fill="#042f2e" stroke="#34d399" stroke-width="1.5"/>
+              <circle cx="22" cy="25" r="2.5" fill="#042f2e" stroke="#34d399" stroke-width="1.5"/>
+              <rect x="4" y="17" width="4" height="1.5" rx="0.75" fill="#6ee7b7" opacity="0.7"/>
+            </svg>
+            <div><div style={S.logoT}>MotoristaApp</div><div style={S.logoS}>Olá, {nomeUser}! {DEMO&&<span style={{background:"#f59e0b",color:"#000",fontSize:9,fontWeight:700,padding:"1px 6px",borderRadius:99}}>DEMO</span>}</div></div>
+          </div>
           <div style={{display:"flex",gap:6,alignItems:"center"}}>
             {!online&&<div style={{background:"#334155",color:"#94a3b8",fontSize:10,fontWeight:700,padding:"2px 8px",borderRadius:99}}>📶 Offline</div>}
             {saved&&<div style={{background:"#22c55e",color:"#fff",fontSize:11,padding:"3px 8px",borderRadius:20,fontWeight:700}}>✓</div>}
@@ -679,23 +689,104 @@ export default function MotoristaApp(){
 
         {/* ══ DASHBOARD ══ */}
         {tab===0&&<div style={S.page}>
+
+          {/* Seletor de mês */}
           <div style={S.mesSel}>
             <button style={S.mesBtn} onClick={()=>navMes(-1)}>‹</button>
             <span style={S.mesNome}>{nomeMes(mesSel)}</span>
             <button style={S.mesBtn} onClick={()=>navMes(1)} disabled={mesSel>=getMes(0)}>›</button>
           </div>
-          <div style={S.sec}>Resultados</div>
-          <div style={S.row2}><Card label="Ganho Bruto" value={fmt(ganhoMes)} grad={S.cGreen}/><Card label="Lucro Operacional" value={fmt(lucroMes)} grad={S.cBlue}/></div>
-          <div style={S.row2}><Card label="Despesas Fixas" value={fmt(totalDesp+totalManut)} grad={S.cRed}/><Card label="Lucro Líquido" value={fmt(lucroLiq)} grad={S.cPurple}/></div>
-          {horasMes>0&&<div style={S.row2}><Card label="Horas" value={`${horasMes.toFixed(1)}h`} grad={S.cSlate}/><Card label="Lucro/hora" value={fmt(lucroMes/horasMes)} grad={S.cTeal}/></div>}
-          <div style={{...S.card,...S.cFull}}><div style={S.cardLbl}>KM rodados</div><div style={S.cardVal}>{kmMes.toFixed(0)} km</div></div>
-          <div style={S.metaCard}>
-            <div style={S.metaTop}><span style={S.metaLbl}>Meta mensal</span><span style={S.metaVals}>{fmt(lucroLiq)} / {fmt(d.config.metaMensal)}</span></div>
-            <div style={S.progBg}><div style={{...S.progBar,width:`${progMeta}%`,background:progMeta>=100?"#22c55e":progMeta>=60?"#f59e0b":"#3b82f6"}}/></div>
-            <div style={S.metaInfo}>{progMeta.toFixed(0)}% · falta {fmt(faltaMeta)} · {fmt(porDia)}/dia</div>
+
+          {/* Card principal — Lucro no bolso em destaque */}
+          <div style={{background:"linear-gradient(135deg,#064e3b,#065f46)",borderRadius:16,padding:"20px 18px",marginBottom:10,border:"1px solid #34d39944",position:"relative",overflow:"hidden"}}>
+            <div style={{position:"absolute",top:-20,right:-20,width:100,height:100,background:"radial-gradient(circle,#34d39922,transparent)"}}/>
+            <div style={{fontSize:11,color:"#6ee7b7",fontWeight:700,textTransform:"uppercase",letterSpacing:1,marginBottom:4}}>💰 Dinheiro no seu bolso</div>
+            <div style={{fontSize:36,fontWeight:900,color:"#fff",marginBottom:2}}>{fmt(lucroLiq)}</div>
+            <div style={{fontSize:12,color:"#6ee7b7",opacity:0.8}}>Após descontar comissões, custos e despesas fixas</div>
+            {horasMes>0&&<div style={{marginTop:10,padding:"6px 10px",background:"#06433244",borderRadius:8,display:"inline-block",fontSize:12,color:"#34d399"}}>⏱ {fmt(lucroLiq/horasMes)} por hora trabalhada</div>}
           </div>
-          {rankSorted.length>0&&<><div style={S.sec}>🏆 Ranking</div>{rankSorted.map(([nome,v],i)=>(<div key={nome} style={S.rankRow}><div style={S.rankLeft}><span style={S.rankPos}>{i+1}º</span><div><div style={S.rankNome}>{nome}</div><div style={S.rankSub}>{v.km}km{v.horas>0?` · ${fmt(v.lucro/v.horas)}/h`:` · ${getComissao(nome)}%`}</div></div></div><div style={S.rankRight}><div style={S.rankLucro}>{fmt(v.lucro)}</div><div style={S.rankBruto}>{fmt(v.ganho)} bruto</div></div></div>))}</>}
-          {corridasMes.length===0&&<div style={S.empty}>Nenhum registro em {nomeMes(mesSel)}.<br/>Lance seu primeiro dia! 🚗</div>}
+
+          {/* Cards secundários */}
+          <div style={S.row2}>
+            <div style={{...S.card,...S.cGreen}}>
+              <div style={S.cardLbl}>Ganho Bruto</div>
+              <div style={S.cardVal}>{fmt(ganhoMes)}</div>
+              <div style={{fontSize:10,color:"#6ee7b7",marginTop:3}}>Total recebido dos apps</div>
+            </div>
+            <div style={{...S.card,background:"linear-gradient(135deg,#1e3a5f,#1e40af)"}}>
+              <div style={S.cardLbl}>Lucro Bruto</div>
+              <div style={S.cardVal}>{fmt(lucroMes)}</div>
+              <div style={{fontSize:10,color:"#93c5fd",marginTop:3}}>Após comissões e km</div>
+            </div>
+          </div>
+
+          {/* Custos em linha */}
+          <div style={{background:"#1e293b",borderRadius:12,padding:"12px 14px",marginBottom:8,border:"1px solid #334155"}}>
+            <div style={{fontSize:11,color:"#64748b",fontWeight:700,textTransform:"uppercase",letterSpacing:1,marginBottom:10}}>Seus custos este mês</div>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8}}>
+              <div style={{textAlign:"center"}}>
+                <div style={{fontSize:10,color:"#64748b",marginBottom:3}}>Despesas Fixas</div>
+                <div style={{fontSize:15,fontWeight:800,color:"#f87171"}}>{fmt(totalDesp)}</div>
+              </div>
+              <div style={{textAlign:"center",borderLeft:"1px solid #334155",borderRight:"1px solid #334155"}}>
+                <div style={{fontSize:10,color:"#64748b",marginBottom:3}}>Manutenção</div>
+                <div style={{fontSize:15,fontWeight:800,color:"#f87171"}}>{fmt(totalManut)}</div>
+              </div>
+              <div style={{textAlign:"center"}}>
+                <div style={{fontSize:10,color:"#64748b",marginBottom:3}}>KM Rodados</div>
+                <div style={{fontSize:15,fontWeight:800,color:"#e2e8f0"}}>{kmMes.toFixed(0)}km</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Meta */}
+          <div style={S.metaCard}>
+            <div style={S.metaTop}>
+              <span style={S.metaLbl}>🎯 Meta do mês</span>
+              <span style={S.metaVals}>{fmt(lucroLiq)} / {fmt(d.config.metaMensal)}</span>
+            </div>
+            <div style={S.progBg}><div style={{...S.progBar,width:`${progMeta}%`,background:progMeta>=100?"#22c55e":progMeta>=60?"#f59e0b":"#3b82f6"}}/></div>
+            <div style={{display:"flex",justifyContent:"space-between",marginTop:6}}>
+              <div style={S.metaInfo}>{progMeta.toFixed(0)}% atingido</div>
+              {diasRest>0&&<div style={S.metaInfo}>Falta {fmt(faltaMeta)} · {fmt(porDia)}/dia</div>}
+              {progMeta>=100&&<div style={{fontSize:11,color:"#22c55e",fontWeight:700}}>🎉 Meta batida!</div>}
+            </div>
+          </div>
+
+          {/* Ranking plataformas */}
+          {rankSorted.length>0&&<>
+            <div style={S.sec}>🏆 Qual app pagou mais</div>
+            {rankSorted.map(([nome,v],i)=>(
+              <div key={nome} style={S.rankRow}>
+                <div style={S.rankLeft}>
+                  <span style={{...S.rankPos,color:i===0?"#f59e0b":i===1?"#94a3b8":"#b45309"}}>{i+1}º</span>
+                  <div>
+                    <div style={S.rankNome}>{nome}</div>
+                    <div style={S.rankSub}>{v.km}km{v.horas>0?` · ${fmt(v.lucro/v.horas)}/h`:` · ${getComissao(nome)}% comissão`}</div>
+                  </div>
+                </div>
+                <div style={S.rankRight}>
+                  <div style={S.rankLucro}>{fmt(v.lucro)}</div>
+                  <div style={S.rankBruto}>{fmt(v.ganho)} bruto</div>
+                </div>
+              </div>
+            ))}
+          </>}
+
+          {/* Botão backup */}
+          <button style={{width:"100%",background:"#1e293b",border:"1px solid #334155",borderRadius:11,padding:"12px",color:"#64748b",fontSize:13,fontWeight:600,cursor:"pointer",marginTop:8,display:"flex",alignItems:"center",justifyContent:"center",gap:8}}
+            onClick={()=>{
+              const dados={exportadoEm:new Date().toISOString(),usuario:user?.email,...d};
+              const blob=new Blob([JSON.stringify(dados,null,2)],{type:"application/json"});
+              const url=URL.createObjectURL(blob);
+              const a=document.createElement("a");
+              a.href=url;a.download=`backup-motoristaaapp-${today()}.json`;a.click();
+              URL.revokeObjectURL(url);
+            }}>
+            💾 Backup dos meus dados
+          </button>
+
+          {corridasMes.length===0&&<div style={S.empty}>Nenhum registro em {nomeMes(mesSel)}.<br/>Lance seu primeiro dia na aba Lançar! 🚗</div>}
         </div>}
 
         {/* ══ LANÇAR ══ */}
@@ -844,8 +935,12 @@ export default function MotoristaApp(){
           {despMes.length>0&&<>{despMes.map(x=>(<div key={x.id} style={S.despRow}><span style={S.despNome}>{x.nome}</span><div style={S.despRight}><span style={S.despVal}>{fmt(x.valor)}</span><button style={S.delBtn} onClick={()=>del("despesasFixas",x.id)}>✕</button></div></div>))}
           <div style={S.despTotal}><span>Total</span><span>{fmt(totalDesp)}</span></div></>}
 
-          <div style={{...S.sec,cursor:"pointer",display:"flex",justifyContent:"space-between"}} onClick={()=>setShowAvancado(!showAvancado)}>
-            <span>⚙️ Avançado</span><span>{showAvancado?"▲":"▼"}</span>
+          <div style={{background:showAvancado?"#065f4620":"#1e293b",border:`1.5px solid ${showAvancado?"#34d399":"#334155"}`,borderRadius:12,padding:"14px 16px",cursor:"pointer",display:"flex",justifyContent:"space-between",alignItems:"center",marginTop:16}} onClick={()=>setShowAvancado(!showAvancado)}>
+            <div>
+              <div style={{fontSize:13,fontWeight:700,color:showAvancado?"#34d399":"#e2e8f0"}}>⚙️ Configurações Avançadas</div>
+              <div style={{fontSize:11,color:"#64748b",marginTop:2}}>Plataformas, comissões, custo por km</div>
+            </div>
+            <div style={{fontSize:18,color:showAvancado?"#34d399":"#64748b",transition:"transform 0.2s",transform:showAvancado?"rotate(180deg)":"rotate(0deg)"}}>▼</div>
           </div>
           {showAvancado&&<><div style={S.formCard}>
             <FR l="Custo por km (R$)"><input style={S.inp} type="number" step="0.01" value={cfgEx.custoPorKm} onChange={e=>setCfgForm({...(cfgForm||d.config),custoPorKm:parseFloat(e.target.value)})}/><div style={S.hint}>Combustível + desgaste + manutenção por km</div></FR>
