@@ -3,618 +3,282 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>MotoristaApp — Descubra quanto você realmente ganha</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800;900&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
+<meta name="theme-color" content="#ffffff"/>
+<title>MotoristaApp — Quanto você ganha de verdade ao final do dia?</title>
+<meta name="description" content="App de controle financeiro para motoristas de aplicativo. Veja seu lucro real depois das comissões e custos, qual app paga mais e quanto falta pra bater sua meta."/>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700;9..144,900&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600;700&display=swap" rel="stylesheet"/>
 <style>
-  :root {
-    --black: #080c14;
-    --dark: #0f172a;
-    --card: #141e30;
-    --border: #1e2d45;
-    --blue: #059669;
-    --blue2: #047857;
-    --green: #22c55e;
-    --yellow: #f59e0b;
-    --red: #ef4444;
-    --text: #f1f5f9;
-    --muted: #64748b;
-    --sub: #94a3b8;
-  }
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  html { scroll-behavior: smooth; }
-  body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--black);
-    color: var(--text);
-    overflow-x: hidden;
-  }
+:root{
+  --bg:#ffffff;
+  --bg-soft:#f6f6f1;
+  --ink:#15201c;
+  --muted:#5b6660;
+  --line:#e5e4dc;
+  --brand:#0b6b4f;
+  --brand-dark:#084f3a;
+  --brand-soft:#e3f2ec;
+  --coral:#c84a26;
+  --coral-soft:#fbe9e1;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased;}
+a{color:inherit;}
+:focus-visible{outline:2px solid var(--brand);outline-offset:3px;border-radius:4px;}
+.disp{font-family:'Fraunces',serif;}
+.mono{font-family:'IBM Plex Mono',monospace;}
 
-  /* ── NOISE TEXTURE ── */
-  body::before {
-    content: '';
-    position: fixed; inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-    pointer-events: none; z-index: 0;
-  }
+.hero{padding:64px 20px 48px;text-align:center;max-width:720px;margin:0 auto;}
+.badge{display:inline-flex;align-items:center;gap:8px;background:var(--brand-soft);border:1px solid #0b6b4f22;border-radius:99px;padding:7px 16px;font-size:13px;color:var(--brand-dark);font-weight:600;margin-bottom:24px;}
+.hero h1{font-family:'Fraunces',serif;font-optical-sizing:auto;font-size:clamp(30px,6vw,48px);font-weight:700;line-height:1.15;letter-spacing:-0.5px;margin-bottom:18px;}
+.hero h1 em{font-style:italic;color:var(--brand);}
+.hero-sub{font-size:clamp(15px,2vw,17px);color:var(--muted);max-width:480px;margin:0 auto 30px;line-height:1.65;}
+.btn-cta{background:var(--brand);color:#fff;font-family:'IBM Plex Sans',sans-serif;font-size:16px;font-weight:600;border:none;border-radius:11px;padding:16px 32px;cursor:pointer;text-decoration:none;display:inline-block;box-shadow:0 10px 24px -8px #0b6b4f55;transition:transform .15s,box-shadow .15s;}
+.btn-cta:hover{transform:translateY(-1px);box-shadow:0 14px 28px -8px #0b6b4f66;}
+.cta-note{font-size:13px;color:var(--muted);margin-top:12px;}
 
-  /* ── HERO ── */
-  .hero {
-    min-height: 100vh;
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    padding: 80px 20px 60px;
-    text-align: center;
-    position: relative;
-    overflow: hidden;
-  }
-  .hero::after {
-    content: '';
-    position: absolute;
-    width: 700px; height: 700px;
-    background: radial-gradient(circle, #05966922 0%, transparent 70%);
-    top: -200px; left: 50%; transform: translateX(-50%);
-    pointer-events: none;
-  }
-  .hero-badge {
-    display: inline-flex; align-items: center; gap: 8px;
-    background: #05966918; border: 1px solid #05966944;
-    border-radius: 99px; padding: 6px 16px;
-    font-size: 13px; color: #34d399; font-weight: 600;
-    margin-bottom: 28px; position: relative; z-index: 1;
-    animation: fadeUp 0.6s ease both;
-  }
-  .hero-badge span { width: 6px; height: 6px; border-radius: 99px; background: #22c55e; display: inline-block; animation: pulse 2s infinite; }
-  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(1.4)} }
+.calc-wrap{max-width:480px;margin:8px auto 0;padding:0 20px;}
+.calc-card{background:var(--bg-soft);border:1px solid var(--line);border-radius:20px;padding:28px 24px;}
+.calc-label{font-size:13px;font-weight:600;color:var(--muted);margin-bottom:10px;}
+.calc-input-row{display:flex;align-items:center;gap:10px;background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:10px 14px;margin-bottom:16px;}
+.calc-input-row span{font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:600;color:var(--ink);}
+.calc-input-row input[type=number]{border:none;outline:none;font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:600;width:100%;color:var(--ink);background:transparent;}
+.calc-range{width:100%;margin-bottom:20px;accent-color:var(--brand);}
+.calc-rows{display:flex;flex-direction:column;gap:9px;border-top:1px dashed var(--line);padding-top:16px;margin-bottom:14px;}
+.calc-row{display:flex;justify-content:space-between;font-size:14px;color:var(--muted);}
+.calc-row span.v{font-family:'IBM Plex Mono',monospace;color:var(--coral);font-weight:600;}
+.calc-final{display:flex;justify-content:space-between;align-items:baseline;border-top:2px solid var(--ink);padding-top:14px;}
+.calc-final .lbl{font-family:'Fraunces',serif;font-size:16px;font-weight:700;}
+.calc-final .val{font-family:'IBM Plex Mono',monospace;font-size:30px;font-weight:700;color:var(--brand);}
+.calc-pct{text-align:center;margin-top:14px;font-size:12.5px;color:var(--muted);}
+.calc-pct b{color:var(--brand-dark);}
 
-  .hero h1 {
-    font-family: 'Syne', sans-serif;
-    font-size: clamp(38px, 8vw, 76px);
-    font-weight: 900;
-    line-height: 1.05;
-    letter-spacing: -2px;
-    margin-bottom: 24px;
-    position: relative; z-index: 1;
-    animation: fadeUp 0.7s 0.1s ease both;
-  }
-  .hero h1 em { font-style: normal; color: #059669; }
-  .hero h1 .strike { position: relative; color: var(--muted); }
-  .hero h1 .strike::after { content: ''; position: absolute; left: 0; top: 50%; width: 100%; height: 3px; background: var(--red); transform: rotate(-3deg); }
+section{padding:64px 20px;max-width:880px;margin:0 auto;}
+.eyebrow{font-family:'IBM Plex Mono',monospace;font-size:11.5px;font-weight:600;color:var(--brand);text-transform:uppercase;letter-spacing:2px;margin-bottom:12px;display:block;}
+.sec-title{font-family:'Fraunces',serif;font-size:clamp(24px,4vw,34px);font-weight:700;line-height:1.18;letter-spacing:-0.3px;margin-bottom:14px;}
+.sec-sub{font-size:15.5px;color:var(--muted);line-height:1.65;max-width:520px;}
 
-  .hero-sub {
-    font-size: clamp(16px, 2.5vw, 20px);
-    color: var(--sub); max-width: 560px; line-height: 1.65;
-    margin-bottom: 40px; position: relative; z-index: 1;
-    animation: fadeUp 0.7s 0.2s ease both;
-  }
+.feat-list{margin-top:32px;border-top:1px solid var(--line);}
+@media(min-width:760px){.feat-list{display:grid;grid-template-columns:1fr 1fr;column-gap:44px;}}
+.feat-row{display:grid;grid-template-columns:38px 1fr;gap:14px;padding:19px 0;border-bottom:1px solid var(--line);}
+.feat-icon{font-size:22px;line-height:1;}
+.feat-title{font-family:'Fraunces',serif;font-weight:700;font-size:15.5px;margin-bottom:4px;}
+.feat-text{font-size:13.5px;color:var(--muted);line-height:1.6;}
 
-  .cta-group {
-    display: flex; flex-direction: column; align-items: center; gap: 12px;
-    position: relative; z-index: 1;
-    animation: fadeUp 0.7s 0.3s ease both;
-  }
-  .btn-cta {
-    background: linear-gradient(135deg, #059669, #047857);
-    color: #fff; font-family: 'DM Sans', sans-serif;
-    font-size: 17px; font-weight: 700;
-    border: none; border-radius: 14px;
-    padding: 18px 40px; cursor: pointer;
-    box-shadow: 0 0 40px #05966944;
-    transition: transform 0.2s, box-shadow 0.2s;
-    text-decoration: none; display: inline-block;
-  }
-  .btn-cta:hover { transform: translateY(-2px); box-shadow: 0 0 60px #05966966; }
-  .cta-note { font-size: 13px; color: var(--muted); }
-  .cta-note strong { color: var(--green); }
+.nums{background:var(--bg-soft);border-top:1px solid var(--line);border-bottom:1px solid var(--line);}
+.nums section{padding:48px 20px;}
+.nums-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:22px;}
+.num-item{text-align:center;}
+.num-val{font-family:'IBM Plex Mono',monospace;font-size:clamp(26px,4.6vw,34px);font-weight:700;line-height:1;margin-bottom:7px;color:var(--brand-dark);}
+.num-lbl{font-size:12.5px;color:var(--muted);}
 
-  /* ── MOCKUP ── */
-  .mockup-section {
-    padding: 0 20px 80px;
-    display: flex; justify-content: center;
-    position: relative; z-index: 1;
-  }
-  .phone-frame {
-    width: min(340px, 90vw);
-    background: var(--dark);
-    border-radius: 36px;
-    border: 2px solid var(--border);
-    box-shadow: 0 40px 100px #000a, 0 0 0 1px #ffffff08;
-    overflow: hidden;
-    animation: fadeUp 0.8s 0.4s ease both;
-  }
-  .phone-notch { height: 28px; background: var(--dark); display: flex; align-items: center; justify-content: center; }
-  .phone-notch-pill { width: 80px; height: 8px; background: #1e293b; border-radius: 99px; }
-  .phone-header { background: linear-gradient(135deg,#1e3a5f,#1e293b); padding: 12px 16px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-  .phone-logo { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 800; }
-  .phone-tag { background: #22c55e; color: #000; font-size: 9px; font-weight: 800; padding: 2px 8px; border-radius: 99px; }
-  .phone-body { padding: 14px; }
-  .phone-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
-  .pc { border-radius: 11px; padding: 11px 13px; }
-  .pc-label { font-size: 9px; color: #cbd5e1; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 3px; }
-  .pc-val { font-size: 17px; font-weight: 800; font-family: 'Syne', sans-serif; }
-  .pc-green { background: linear-gradient(135deg,#064e3b,#065f46); }
-  .pc-blue  { background: linear-gradient(135deg,#064e3b,#065f46); }
-  .pc-red   { background: linear-gradient(135deg,#7f1d1d,#991b1b); }
-  .pc-purple{ background: linear-gradient(135deg,#4c1d95,#5b21b6); }
-  .phone-meta { background: #1e293b; border-radius: 10px; padding: 11px 13px; border: 1px solid var(--border); margin-bottom: 12px; }
-  .meta-row { display: flex; justify-content: space-between; margin-bottom: 7px; font-size: 11px; color: var(--sub); }
-  .prog-bg { background: #334155; border-radius: 99px; height: 6px; overflow: hidden; }
-  .prog-bar { height: 100%; border-radius: 99px; background: var(--green); width: 72%; }
-  .phone-rank { background: #1e293b; border-radius: 10px; padding: 11px 13px; border: 1px solid var(--border); }
-  .rank-item { display: flex; justify-content: space-between; align-items: center; padding: 5px 0; border-bottom: 1px solid #334155; }
-  .rank-item:last-child { border-bottom: none; }
-  .rank-left { display: flex; gap: 8px; align-items: center; }
-  .rank-num { font-size: 14px; font-weight: 900; color: var(--muted); font-family: 'Syne', sans-serif; }
-  .rank-info { font-size: 11px; font-weight: 700; }
-  .rank-sub2 { font-size: 9px; color: var(--muted); }
-  .rank-val { font-size: 12px; font-weight: 800; color: var(--green); font-family: 'Syne', sans-serif; }
+.founder-card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:30px 26px;margin-top:32px;box-shadow:0 18px 40px -22px #0008;}
+.founder-top{display:flex;align-items:center;gap:14px;margin-bottom:18px;}
+.founder-avatar{width:52px;height:52px;border-radius:50%;background:var(--brand-soft);color:var(--brand-dark);display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-weight:700;font-size:20px;flex-shrink:0;}
+.founder-name{font-weight:600;font-size:14.5px;}
+.founder-role{font-size:12.5px;color:var(--muted);}
+.founder-quote{font-family:'Fraunces',serif;font-size:17px;font-style:italic;line-height:1.6;color:var(--ink);margin-bottom:14px;}
+.founder-text{font-size:14px;color:var(--muted);line-height:1.7;}
 
-  /* ── SECTIONS ── */
-  section { padding: 80px 20px; max-width: 960px; margin: 0 auto; }
+.price-card{background:#fff;border:1.5px solid var(--line);border-radius:20px;max-width:380px;margin:36px auto 0;padding:32px 28px;text-align:center;box-shadow:0 24px 50px -26px #0008;}
+.price-tag{display:inline-block;background:var(--brand-soft);color:var(--brand-dark);font-size:12px;font-weight:700;padding:5px 14px;border-radius:99px;margin-bottom:16px;}
+.price-val{font-family:'IBM Plex Mono',monospace;font-size:46px;font-weight:700;color:var(--ink);}
+.price-period{font-size:13.5px;color:var(--muted);margin-bottom:22px;}
+.price-list{list-style:none;display:flex;flex-direction:column;gap:10px;margin-bottom:24px;text-align:left;}
+.price-list li{font-size:14px;color:var(--ink);display:flex;gap:9px;align-items:flex-start;}
+.price-list li::before{content:'✓';color:var(--brand);font-weight:700;flex-shrink:0;}
+.price-fine{font-size:12px;color:var(--muted);margin-top:14px;line-height:1.6;}
 
-  .section-label {
-    font-size: 12px; font-weight: 700; color: #059669;
-    text-transform: uppercase; letter-spacing: 2px;
-    margin-bottom: 14px; display: block;
-  }
-  .section-title {
-    font-family: 'Syne', sans-serif;
-    font-size: clamp(28px, 5vw, 44px);
-    font-weight: 900; line-height: 1.1;
-    letter-spacing: -1px; margin-bottom: 16px;
-  }
-  .section-sub { font-size: 17px; color: var(--sub); line-height: 1.65; max-width: 560px; }
+.faq-list{margin-top:32px;display:flex;flex-direction:column;gap:8px;}
+.faq-item{background:var(--bg-soft);border:1px solid var(--line);border-radius:12px;overflow:hidden;}
+.faq-q{width:100%;background:none;border:none;padding:16px 18px;color:var(--ink);font-family:'IBM Plex Sans',sans-serif;font-size:14.5px;font-weight:600;text-align:left;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:12px;}
+.faq-a{padding:0 18px 16px;font-size:13.5px;color:var(--muted);line-height:1.7;display:none;}
+.faq-item.open .faq-a{display:block;}
+.faq-arrow{transition:transform .2s;flex-shrink:0;color:var(--muted);font-size:12px;}
+.faq-item.open .faq-arrow{transform:rotate(180deg);color:var(--brand);}
+@media(prefers-reduced-motion:reduce){.faq-arrow{transition:none;}}
 
-  /* ── PROBLEMA ── */
-  .problem-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin-top: 40px; }
-  .problem-card {
-    background: var(--card); border: 1px solid var(--border);
-    border-radius: 16px; padding: 24px;
-    transition: border-color 0.2s;
-  }
-  .problem-card:hover { border-color: #ef444466; }
-  .problem-icon { font-size: 28px; margin-bottom: 12px; }
-  .problem-title { font-family: 'Syne', sans-serif; font-size: 17px; font-weight: 800; margin-bottom: 8px; }
-  .problem-text { font-size: 14px; color: var(--sub); line-height: 1.6; }
+.cta-final{background:var(--brand-dark);color:#fff;text-align:center;padding:70px 20px;}
+.cta-final .sec-title{color:#fff;}
+.cta-final .sec-sub{color:#d7e8e0;margin:0 auto 28px;}
+.cta-final .btn-cta{background:#fff;color:var(--brand-dark);box-shadow:none;}
+.cta-final .btn-cta:hover{transform:translateY(-1px);}
 
-  /* ── FEATURES ── */
-  .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-top: 40px; }
-  .feat-card {
-    background: var(--card); border: 1px solid var(--border);
-    border-radius: 16px; padding: 24px;
-    transition: border-color 0.3s, transform 0.3s;
-  }
-  .feat-card:hover { border-color: #05966988; transform: translateY(-3px); }
-  .feat-icon { font-size: 32px; margin-bottom: 14px; }
-  .feat-title { font-family: 'Syne', sans-serif; font-size: 17px; font-weight: 800; margin-bottom: 8px; }
-  .feat-text { font-size: 14px; color: var(--sub); line-height: 1.65; }
+footer{padding:28px 20px 90px;text-align:center;color:var(--muted);font-size:12.5px;border-top:1px solid var(--line);}
+footer a{text-decoration:none;color:var(--muted);margin:0 7px;}
+footer a:hover{color:var(--brand);}
 
-  /* ── NUMEROS ── */
-  .numbers-section { background: linear-gradient(135deg, #0f1f3d, #0a1628); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
-  .numbers-section section { padding: 60px 20px; }
-  .numbers-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 24px; }
-  .num-item { text-align: center; }
-  .num-val { font-family: 'Syne', sans-serif; font-size: 48px; font-weight: 900; color: #059669; line-height: 1; margin-bottom: 8px; }
-  .num-label { font-size: 14px; color: var(--sub); }
+.sticky{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--line);padding:12px 18px;z-index:100;display:none;box-shadow:0 -8px 24px -16px #0003;}
+@media(max-width:640px){.sticky{display:block;}}
+.sticky-inner{display:flex;justify-content:space-between;align-items:center;max-width:500px;margin:0 auto;gap:14px;}
+.sticky-price{font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;}
+.sticky-sub{font-size:10.5px;color:var(--muted);}
+.sticky-btn{background:var(--brand);color:#fff;border:none;border-radius:9px;padding:11px 18px;font-size:13.5px;font-weight:600;cursor:pointer;white-space:nowrap;}
 
-  /* ── DEPOIMENTOS ── */
-  .testimonials { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-top: 40px; }
-  .testi {
-    background: var(--card); border: 1px solid var(--border);
-    border-radius: 16px; padding: 24px;
-  }
-  .testi-stars { color: var(--yellow); font-size: 16px; margin-bottom: 14px; }
-  .testi-text { font-size: 15px; color: var(--sub); line-height: 1.7; margin-bottom: 18px; font-style: italic; }
-  .testi-author { display: flex; align-items: center; gap: 12px; }
-  .testi-avatar { width: 40px; height: 40px; border-radius: 99px; background: linear-gradient(135deg, #059669, #7c3aed); display: flex; align-items: center; justify-content: center; font-size: 18px; }
-  .testi-name { font-weight: 700; font-size: 14px; }
-  .testi-role { font-size: 12px; color: var(--muted); }
-
-  /* ── PRICING ── */
-  .pricing-card {
-    background: var(--card);
-    border: 2px solid #059669;
-    border-radius: 24px; padding: 40px;
-    max-width: 420px; margin: 40px auto 0;
-    text-align: center;
-    box-shadow: 0 0 60px #05966922;
-    position: relative; overflow: hidden;
-  }
-  .pricing-card::before {
-    content: '';
-    position: absolute; top: 0; left: 0; right: 0; height: 3px;
-    background: linear-gradient(90deg, #059669, #7c3aed, var(--green));
-  }
-  .pricing-tag { background: var(--green); color: #000; font-size: 12px; font-weight: 800; padding: 4px 14px; border-radius: 99px; display: inline-block; margin-bottom: 20px; }
-  .pricing-price { font-family: 'Syne', sans-serif; font-size: 60px; font-weight: 900; line-height: 1; margin-bottom: 4px; }
-  .pricing-period { font-size: 15px; color: var(--muted); margin-bottom: 28px; }
-  .pricing-list { list-style: none; text-align: left; margin-bottom: 32px; display: flex; flex-direction: column; gap: 12px; }
-  .pricing-list li { display: flex; align-items: center; gap: 10px; font-size: 15px; color: var(--sub); }
-  .pricing-list li::before { content: '✓'; color: var(--green); font-weight: 800; font-size: 16px; flex-shrink: 0; }
-  .pricing-trial { font-size: 13px; color: var(--muted); margin-top: 14px; }
-  .pricing-trial strong { color: var(--green); }
-
-  /* ── FAQ ── */
-  .faq-list { margin-top: 40px; display: flex; flex-direction: column; gap: 12px; }
-  .faq-item {
-    background: var(--card); border: 1px solid var(--border);
-    border-radius: 14px; overflow: hidden;
-  }
-  .faq-q {
-    width: 100%; background: none; border: none;
-    padding: 20px 24px; color: var(--text);
-    font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 600;
-    text-align: left; cursor: pointer;
-    display: flex; justify-content: space-between; align-items: center; gap: 12px;
-  }
-  .faq-q:hover { color: #34d399; }
-  .faq-a { padding: 0 24px 20px; font-size: 14px; color: var(--sub); line-height: 1.7; display: none; }
-  .faq-item.open .faq-a { display: block; }
-  .faq-item.open .faq-arrow { transform: rotate(180deg); }
-  .faq-arrow { transition: transform 0.2s; flex-shrink: 0; }
-
-  /* ── CTA FINAL ── */
-  .cta-final {
-    background: linear-gradient(135deg, #0f1f3d, #131f35);
-    border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
-    text-align: center; padding: 80px 20px;
-  }
-
-  /* ── FOOTER ── */
-  footer { padding: 32px 20px; text-align: center; color: var(--muted); font-size: 13px; border-top: 1px solid var(--border); }
-
-  /* ── ANIMATIONS ── */
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(24px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-  .fade-in { opacity: 0; transform: translateY(30px); transition: opacity 0.7s ease, transform 0.7s ease; }
-  .fade-in.visible { opacity: 1; transform: translateY(0); }
-
-  /* ── STICKY CTA MOBILE ── */
-  .sticky-cta {
-    position: fixed; bottom: 0; left: 0; right: 0;
-    background: var(--dark); border-top: 1px solid var(--border);
-    padding: 12px 20px; z-index: 100;
-    display: none;
-  }
-  @media (max-width: 640px) { .sticky-cta { display: block; } }
-  .sticky-inner { display: flex; justify-content: space-between; align-items: center; max-width: 500px; margin: 0 auto; }
-  .sticky-price { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 900; }
-  .sticky-sub { font-size: 11px; color: var(--muted); }
-  .sticky-btn { background: linear-gradient(135deg,#059669,#047857); color: #fff; border: none; border-radius: 10px; padding: 11px 20px; font-size: 14px; font-weight: 700; cursor: pointer; white-space: nowrap; }
-
-  @media (max-width: 640px) {
-    .hero { padding: 60px 16px 40px; }
-    section { padding: 60px 16px; }
-    .pricing-card { padding: 28px 20px; }
-  }
+@media(max-width:640px){section{padding:48px 18px;}}
 </style>
 </head>
 <body>
 
-<!-- ══ HERO ══ -->
 <div class="hero">
-  <div class="hero-badge"><span></span> Mais de 1,7 milhão de motoristas no Brasil</div>
-  <h1>Você sabe quanto<br/><em>realmente</em> ganha<br/>por <span class="strike">corrida</span>?</h1>
-  <p class="hero-sub">A maioria dos motoristas acha que ganha R$200 por dia. Depois de descontar comissão, combustível e desgaste do carro... sobra muito menos. O MotoristaApp mostra a verdade.</p>
-  <div class="cta-group">
-    <a href="#assinar" class="btn-cta">🚀 Quero saber meu lucro real — 15 dias grátis</a>
-    <p class="cta-note"><strong>✓ 15 dias grátis</strong> · Sem cartão de crédito · Cancele quando quiser</p>
+  <div class="badge">🚘 Mais de 1,7 milhão de motoristas de app no Brasil</div>
+  <h1>Quanto você ganha <em>de verdade</em> ao final do dia?</h1>
+  <p class="hero-sub">O app mostra "R$220 hoje". Mas depois da comissão, do combustível e do desgaste do carro, o que sobra de verdade no seu bolso é outra conta — e é essa que o MotoristaApp faz por você.</p>
+  <a href="https://pay.cakto.com.br/36ewtox_915941" class="btn-cta">Começar agora — 15 dias grátis</a>
+  <p class="cta-note">Sem cartão de crédito · R$12,90/mês depois do teste · Cancele quando quiser</p>
+</div>
+
+<div class="calc-wrap">
+  <div class="calc-card">
+    <div class="calc-label">Quanto você faturou hoje?</div>
+    <div class="calc-input-row">
+      <span>R$</span>
+      <input type="number" id="calcBruto" value="220" min="0" step="10" oninput="calcSync('input')"/>
+    </div>
+    <input type="range" class="calc-range" id="calcRange" min="0" max="600" step="5" value="220" oninput="calcSync('range')"/>
+
+    <div class="calc-rows">
+      <div class="calc-row"><span>Comissão do app (25%)</span><span class="v" id="valComissao">-R$0,00</span></div>
+      <div class="calc-row"><span>Combustível (estimado)</span><span class="v" id="valCombustivel">-R$0,00</span></div>
+      <div class="calc-row"><span>Desgaste do carro</span><span class="v" id="valManut">-R$0,00</span></div>
+    </div>
+
+    <div class="calc-final">
+      <span class="lbl">Seu lucro real</span>
+      <span class="val" id="valLiquido">R$0,00</span>
+    </div>
+    <div class="calc-pct">Disso, <b id="pctLiquido">0%</b> é o que realmente fica com você — o resto evapora em taxas e custos que ninguém te mostra na hora.</div>
   </div>
 </div>
 
-<!-- ══ MOCKUP ══ -->
-<div class="mockup-section">
-  <div class="phone-frame">
-    <div class="phone-notch"><div class="phone-notch-pill"></div></div>
-    <div class="phone-header">
-      <div>
-        <div class="phone-logo">🚘 MotoristaApp</div>
-        <div style="font-size:10px;color:#94a3b8;margin-top:1px">Olá, João! Seu resumo de maio</div>
-      </div>
-      <div class="phone-tag">AO VIVO</div>
-    </div>
-    <div class="phone-body">
-      <div style="font-size:9px;color:#64748b;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:7px">Este mês</div>
-      <div class="phone-cards">
-        <div class="pc pc-green"><div class="pc-label">Ganho Bruto</div><div class="pc-val">R$3.840</div></div>
-        <div class="pc pc-blue"><div class="pc-label">Lucro Oper.</div><div class="pc-val">R$2.190</div></div>
-        <div class="pc pc-red"><div class="pc-label">Despesas</div><div class="pc-val">R$380</div></div>
-        <div class="pc pc-purple"><div class="pc-label">Lucro Líquido</div><div class="pc-val">R$1.810</div></div>
-      </div>
-      <div class="phone-meta">
-        <div class="meta-row"><span>Meta mensal</span><span>R$1.810 / R$2.500</span></div>
-        <div class="prog-bg"><div class="prog-bar"></div></div>
-        <div style="font-size:10px;color:#64748b;margin-top:5px">72% atingido · falta R$690 · R$46/dia</div>
-      </div>
-      <div style="font-size:9px;color:#64748b;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:7px">🏆 Ranking plataformas</div>
-      <div class="phone-rank">
-        <div class="rank-item"><div class="rank-left"><span class="rank-num">1°</span><div><div class="rank-info">InDriver</div><div class="rank-sub2">15% · 380km · 42h</div></div></div><div class="rank-val">R$820</div></div>
-        <div class="rank-item"><div class="rank-left"><span class="rank-num">2°</span><div><div class="rank-info">99</div><div class="rank-sub2">20% · 290km · 35h</div></div></div><div class="rank-val">R$610</div></div>
-        <div class="rank-item"><div class="rank-left"><span class="rank-num">3°</span><div><div class="rank-info">Uber</div><div class="rank-sub2">25% · 310km · 38h</div></div></div><div class="rank-val">R$760</div></div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ══ PROBLEMA ══ -->
-<div class="fade-in">
 <section>
-  <span class="section-label">O problema</span>
-  <h2 class="section-title">Por que motoristas<br/>trabalham muito e<br/>ganham pouco?</h2>
-  <p class="section-sub">Sem controle, você não sabe o que consome seu dinheiro. E continua repetindo os mesmos erros todo mês.</p>
-  <div class="problem-grid">
-    <div class="problem-card">
-      <div class="problem-icon">😵</div>
-      <div class="problem-title">Confunde faturamento com lucro</div>
-      <div class="problem-text">Ganhou R$200 hoje? Mas gastou R$60 de gasolina, deu 25% para o app e rodou 150km... quanto sobrou de verdade?</div>
-    </div>
-    <div class="problem-card">
-      <div class="problem-icon">⛽</div>
-      <div class="problem-title">Não controla o consumo do carro</div>
-      <div class="problem-text">Sem saber quantos km/litro o seu carro faz e o quanto gasta por km, é impossível calcular o custo real de cada corrida.</div>
-    </div>
-    <div class="problem-card">
-      <div class="problem-icon">📉</div>
-      <div class="problem-title">Usa o app que paga menos</div>
-      <div class="problem-text">Uber, 99, InDriver têm comissões diferentes. Sem comparar, você pode estar priorizando o app que te dá menos lucro por hora trabalhada.</div>
-    </div>
-    <div class="problem-card">
-      <div class="problem-icon">🎯</div>
-      <div class="problem-title">Trabalha sem meta definida</div>
-      <div class="problem-text">Sem saber quanto precisa ganhar por dia para fechar o mês bem, você termina o mês sem entender o que aconteceu.</div>
-    </div>
+  <span class="eyebrow">O que o app faz</span>
+  <h2 class="sec-title">Cada número que você precisa pra decidir,<br/>num só lugar.</h2>
+  <p class="sec-sub">Sem planilha, sem calculadora, sem achismo.</p>
+  <div class="feat-list">
+    <div class="feat-row"><div class="feat-icon">💰</div><div><div class="feat-title">Lucro real por corrida</div><div class="feat-text">Veja quanto sobra depois da comissão do app, do custo por km e do combustível. Sem surpresa no fim do mês.</div></div></div>
+    <div class="feat-row"><div class="feat-icon">🏆</div><div><div class="feat-title">Qual app paga mais</div><div class="feat-text">Compare Uber, 99, InDriver e Cabify pelo lucro real por hora. Decisão com dados, não com achismo.</div></div></div>
+    <div class="feat-row"><div class="feat-icon">🧠</div><div><div class="feat-title">Radar de insights</div><div class="feat-text">Análises automáticas: melhor turno, dia mais lucrativo, plataforma mais rentável e projeção do mês.</div></div></div>
+    <div class="feat-row"><div class="feat-icon">🎯</div><div><div class="feat-title">Simulador de metas</div><div class="feat-text">Defina sua meta mensal e veja quanto precisa ganhar por dia pra bater. Atualiza em tempo real.</div></div></div>
+    <div class="feat-row"><div class="feat-icon">🔧</div><div><div class="feat-title">Gestão do veículo</div><div class="feat-text">Controle abastecimentos, manutenções e km/litro. Seu carro é sua ferramenta de trabalho.</div></div></div>
+    <div class="feat-row"><div class="feat-icon">📄</div><div><div class="feat-title">Relatório mensal</div><div class="feat-text">Baixe um resumo completo de qualquer mês: ganhos, gastos e lucro líquido, prontinho.</div></div></div>
+    <div class="feat-row"><div class="feat-icon">💾</div><div><div class="feat-title">Backup dos seus dados</div><div class="feat-text">Exporte e restaure quando quiser. Seus registros sempre seguros e nas suas mãos.</div></div></div>
+    <div class="feat-row"><div class="feat-icon">📱</div><div><div class="feat-title">Em qualquer celular</div><div class="feat-text">Android, iPhone ou computador. Acesse de qualquer lugar com seu login.</div></div></div>
   </div>
 </section>
-</div>
 
-<!-- ══ FEATURES ══ -->
-<div class="fade-in">
-<section>
-  <span class="section-label">O que você ganha</span>
-  <h2 class="section-title">Tudo que um motorista<br/>profissional precisa</h2>
-  <div class="features-grid">
-    <div class="feat-card">
-      <div class="feat-icon">💰</div>
-      <div class="feat-title">Lucro real por dia</div>
-      <div class="feat-text">Lance seus ganhos e veja instantaneamente quanto sobrou depois de descontar comissão do app, custo por km e combustível.</div>
-    </div>
-    <div class="feat-card">
-      <div class="feat-icon">🏆</div>
-      <div class="feat-title">Ranking de plataformas</div>
-      <div class="feat-text">Veja qual app te deu mais lucro real no mês — Uber, 99, InDriver ou Cabify. Tome decisões com dados, não com achismo.</div>
-    </div>
-    <div class="feat-card">
-      <div class="feat-icon">⛽</div>
-      <div class="feat-title">Controle de abastecimento</div>
-      <div class="feat-text">Registre cada abastecimento e descubra quantos km por litro seu carro faz. Saber isso muda completamente seu cálculo de lucro.</div>
-    </div>
-    <div class="feat-card">
-      <div class="feat-icon">🎯</div>
-      <div class="feat-title">Simulador de metas</div>
-      <div class="feat-text">Defina sua meta mensal e veja quanto precisa ganhar por dia para bater. O app atualiza em tempo real conforme você trabalha.</div>
-    </div>
-    <div class="feat-card">
-      <div class="feat-icon">⏱️</div>
-      <div class="feat-title">Lucro por hora trabalhada</div>
-      <div class="feat-text">Lance suas horas e veja quanto está ganhando por hora em cada plataforma. Saber isso é a chave para trabalhar melhor, não mais.</div>
-    </div>
-    <div class="feat-card">
-      <div class="feat-icon">📅</div>
-      <div class="feat-title">Histórico mensal</div>
-      <div class="feat-text">Compare meses, veja sua evolução e entenda os períodos em que você ganha mais. Informação que vale dinheiro.</div>
-    </div>
-    <div class="feat-card">
-      <div class="feat-icon">💸</div>
-      <div class="feat-title">Despesas fixas</div>
-      <div class="feat-text">Registre seguro, revisão, financiamento e parcelas. O app desconta tudo e mostra seu lucro líquido real de verdade.</div>
-    </div>
-    <div class="feat-card">
-      <div class="feat-icon">📤</div>
-      <div class="feat-title">Exportar relatório</div>
-      <div class="feat-text">Gere um relatório completo do mês em segundos. Útil para controle pessoal, imposto de renda ou para mostrar ao contador.</div>
-    </div>
-  </div>
-</section>
-</div>
-
-<!-- ══ NÚMEROS ══ -->
-<div class="numbers-section fade-in">
+<div class="nums">
   <section>
-    <div class="numbers-grid">
-      <div class="num-item"><div class="num-val">1,7M+</div><div class="num-label">Motoristas de app no Brasil</div></div>
-      <div class="num-item"><div class="num-val">25%</div><div class="num-label">É o que a Uber cobra de comissão</div></div>
-      <div class="num-item"><div class="num-val">R$0,45</div><div class="num-label">Custo médio por km rodado</div></div>
-      <div class="num-item"><div class="num-val">+40%</div><div class="num-label">Mais lucro com controle financeiro</div></div>
+    <div class="nums-grid">
+      <div class="num-item"><div class="num-val">1,7M+</div><div class="num-lbl">Motoristas de app no Brasil</div></div>
+      <div class="num-item"><div class="num-val">25%</div><div class="num-lbl">Comissão média que a Uber cobra</div></div>
+      <div class="num-item"><div class="num-val">R$0,45</div><div class="num-lbl">Custo médio por km rodado</div></div>
+      <div class="num-item"><div class="num-val">15 dias</div><div class="num-lbl">Pra testar grátis, sem cartão</div></div>
     </div>
   </section>
 </div>
 
-<!-- ══ DEPOIMENTOS ══ -->
-<div class="fade-in">
 <section>
-  <span class="section-label">Quem já usa</span>
-  <h2 class="section-title">Motoristas que<br/>descobriram a verdade</h2>
-  <div class="testimonials">
-    <div class="testi">
-      <div class="testi-stars">★★★★★</div>
-      <p class="testi-text">"Achava que estava ganhando bem. Com o app descobri que o InDriver me dá 40% mais lucro que a Uber nas minhas rotas. Mudei minha estratégia e aumentei o ganho mensal."</p>
-      <div class="testi-author"><div class="testi-avatar">🚗</div><div><div class="testi-name">Carlos R.</div><div class="testi-role">Motorista há 3 anos · São Paulo</div></div></div>
+  <span class="eyebrow">Por que estamos construindo isso</span>
+  <h2 class="sec-title">Uma palavra direta da fundadora</h2>
+  <div class="founder-card">
+    <div class="founder-top">
+      <div class="founder-avatar">M</div>
+      <div>
+        <div class="founder-name">Mel Mello</div>
+        <div class="founder-role">Fundadora do MotoristaApp</div>
+      </div>
     </div>
-    <div class="testi">
-      <div class="testi-stars">★★★★★</div>
-      <p class="testi-text">"Finalmente entendi por que no fim do mês sempre faltava dinheiro. As despesas fixas que eu não calculava comiam tudo. Agora tenho controle total."</p>
-      <div class="testi-author"><div class="testi-avatar">🚙</div><div><div class="testi-name">Marcos F.</div><div class="testi-role">Motorista parceiro · Belo Horizonte</div></div></div>
-    </div>
-    <div class="testi">
-      <div class="testi-stars">★★★★★</div>
-      <p class="testi-text">"O simulador de metas mudou minha cabeça. Agora sei exatamente quanto preciso fazer por dia e paro quando bato a meta. Trabalho menos e ganho mais."</p>
-      <div class="testi-author"><div class="testi-avatar">🚕</div><div><div class="testi-name">Rafael S.</div><div class="testi-role">Motorista fulltime · Curitiba</div></div></div>
-    </div>
+    <p class="founder-quote">"Sou sincera com você: o MotoristaApp é novo. Ainda não temos milhares de motoristas usando, e eu não vou inventar depoimentos pra parecer que sim."</p>
+    <p class="founder-text">O que eu posso te dizer é por que estou construindo isso: conversando com motoristas, percebi que quase ninguém sabe quanto realmente sobra no fim do dia — só o que o aplicativo mostra antes dos custos. Criei o MotoristaApp pra resolver exatamente esse problema, com as contas que eu mesma gostaria de ter tido. Tem 15 dias grátis pra você testar sem compromisso e ver se faz sentido pra sua rotina. Se tiver qualquer feedback, meu email está no rodapé — eu leio e respondo pessoalmente.</p>
   </div>
 </section>
-</div>
 
-<!-- ══ PRICING ══ -->
-<div class="fade-in">
 <section id="assinar" style="text-align:center">
-  <span class="section-label">Planos</span>
-  <h2 class="section-title">Menos que um cafezinho<br/>por dia</h2>
-  <p class="section-sub" style="margin:0 auto 0">Menos que um cafezinho por dia. Escolha o plano que faz mais sentido para você.</p>
+  <span class="eyebrow">Investimento</span>
+  <h2 class="sec-title">Menos que uma corrida<br/>por mês.</h2>
+  <p class="sec-sub" style="margin:0 auto">Por R$12,90 por mês você tem controle total do seu dinheiro — e o investimento se paga na primeira semana.</p>
 
-  <!-- Toggle anual/mensal -->
-  <div style="display:flex;align-items:center;justify-content:center;gap:12px;margin:28px 0 20px">
-    <span id="lbl-mensal" style="font-size:14px;font-weight:700;color:#f1f5f9">Mensal</span>
-    <div id="toggle-plano" onclick="togglePlano()" style="width:52px;height:28px;background:#1e293b;border-radius:99px;cursor:pointer;position:relative;border:1px solid #334155;transition:background 0.3s">
-      <div id="toggle-ball" style="position:absolute;top:3px;left:3px;width:20px;height:20px;background:#64748b;border-radius:99px;transition:all 0.3s"></div>
-    </div>
-    <span id="lbl-anual" style="font-size:14px;font-weight:600;color:#64748b">Anual <span style="background:#f59e0b;color:#000;font-size:10px;font-weight:900;padding:2px 8px;border-radius:99px;margin-left:4px">-23%</span></span>
-  </div>
-
-  <!-- Plano Mensal -->
-  <div id="plano-mensal" class="pricing-card">
-    <div class="pricing-tag">✨ Mais popular</div>
-    <div class="pricing-price">R$12,90</div>
-    <div class="pricing-period">por mês · cobrado mensalmente</div>
-    <ul class="pricing-list">
+  <div class="price-card">
+    <div class="price-tag">🔥 Preço de lançamento</div>
+    <div class="price-val">R$12,90</div>
+    <div class="price-period">por mês · cobrado mensalmente</div>
+    <ul class="price-list">
       <li>Dashboard completo de lucro real</li>
       <li>Radar de insights inteligentes</li>
       <li>Controle de todas as plataformas</li>
-      <li>Simulador de metas</li>
+      <li>Simulador de metas mensais</li>
       <li>Gestão completa do veículo</li>
-      <li>Histórico de 6 meses</li>
-      <li>Dados salvos na nuvem</li>
+      <li>Relatório mensal pra baixar</li>
+      <li>Backup e restauração de dados</li>
       <li>Suporte por email</li>
-      <li style="color:var(--green);font-weight:600">✓ Cancele quando quiser, sem multa</li>
     </ul>
-    <a href="https://app.cakto.com.br/SEU_LINK_MENSAL" class="btn-cta" style="display:block;text-align:center;font-size:16px;padding:16px">
-      🚀 Começar 15 dias grátis
-    </a>
-    <p class="pricing-trial"><strong>15 dias grátis</strong> · Sem cartão · Cancele quando quiser</p>
-  </div>
-
-  <!-- Plano Anual -->
-  <div id="plano-anual" class="pricing-card" style="display:none;border-color:var(--green);box-shadow:0 0 60px #22c55e22">
-    <div class="pricing-tag" style="background:var(--green);color:#042f2e">🏆 Melhor valor — 2 meses grátis</div>
-    <div class="pricing-price" style="color:var(--green)">R$119,90</div>
-    <div class="pricing-period">por ano · <strong style="color:var(--green)">equivale a R$9,99/mês</strong></div>
-    <div style="background:#064e3b;border:1px solid #22c55e44;border-radius:10px;padding:10px 14px;margin-bottom:20px;font-size:13px;color:#34d399;text-align:center">
-      💰 Você economiza <strong>R$34,90</strong> comparado ao plano mensal
-    </div>
-    <ul class="pricing-list">
-      <li>Tudo do plano mensal incluído</li>
-      <li>2 meses grátis em relação ao mensal</li>
-      <li>Prioridade no suporte</li>
-      <li>Acesso antecipado a novas funcionalidades</li>
-      <li style="color:var(--green);font-weight:600">✓ Cancele quando quiser, sem multa</li>
-    </ul>
-    <a href="https://app.cakto.com.br/SEU_LINK_ANUAL" class="btn-cta" style="display:block;text-align:center;font-size:16px;padding:16px;background:linear-gradient(135deg,#065f46,#064e3b)">
-      🚀 Assinar plano anual — R$119,90
-    </a>
-    <p class="pricing-trial"><strong>15 dias grátis</strong> · Sem cartão · Cancele quando quiser</p>
+    <a href="https://pay.cakto.com.br/36ewtox_915941" class="btn-cta" style="width:100%">Começar 15 dias grátis →</a>
+    <p class="price-fine"><strong style="color:var(--brand-dark)">15 dias grátis</strong> · sem cartão de crédito · cancele quando quiser, sem multa</p>
   </div>
 </section>
-</div>
 
-<!-- ══ FAQ ══ -->
-<div class="fade-in">
 <section>
-  <span class="section-label">Dúvidas</span>
-  <h2 class="section-title">Perguntas frequentes</h2>
+  <span class="eyebrow">Dúvidas</span>
+  <h2 class="sec-title">Perguntas frequentes</h2>
   <div class="faq-list">
-    <div class="faq-item">
-      <button class="faq-q" onclick="toggleFaq(this)">Precisa instalar alguma coisa? <span class="faq-arrow">▼</span></button>
-      <div class="faq-a">Não! O MotoristaApp é um aplicativo web. Basta acessar o link, criar sua conta e adicionar à tela inicial do celular. Funciona igual a um app mas sem precisar de espaço no celular.</div>
-    </div>
-    <div class="faq-item">
-      <button class="faq-q" onclick="toggleFaq(this)">Meus dados ficam seguros? <span class="faq-arrow">▼</span></button>
-      <div class="faq-a">Sim! Seus dados ficam salvos na nuvem com segurança. Você pode acessar de qualquer celular com seu login e senha. Nunca perde nada.</div>
-    </div>
-    <div class="faq-item">
-      <button class="faq-q" onclick="toggleFaq(this)">Como funciona o período de teste? <span class="faq-arrow">▼</span></button>
-      <div class="faq-a">Você tem 15 dias para usar todas as funcionalidades gratuitamente, sem precisar cadastrar cartão. Só após os 15 dias você decide se quer continuar com R$12,90/mês.</div>
-    </div>
-    <div class="faq-item">
-      <button class="faq-q" onclick="toggleFaq(this)">Posso cancelar quando quiser? <span class="faq-arrow">▼</span></button>
-      <div class="faq-a">Sim! Você cancela com um clique, sem burocracia e sem taxas. Seus dados ficam disponíveis até o fim do período pago.</div>
-    </div>
-    <div class="faq-item">
-      <button class="faq-q" onclick="toggleFaq(this)">Funciona com qual plataforma de app? <span class="faq-arrow">▼</span></button>
-      <div class="faq-a">Com todas! Uber, 99, InDriver, Cabify e qualquer outra. Você cadastra as comissões de cada plataforma e o app calcula tudo automaticamente.</div>
-    </div>
-    <div class="faq-item">
-      <button class="faq-q" onclick="toggleFaq(this)">O app funciona sem internet? <span class="faq-arrow">▼</span></button>
-      <div class="faq-a">Você precisa de internet para salvar e sincronizar seus dados. Para uso offline, os dados do dia ficam em cache no celular e sincronizam quando a internet voltar.</div>
-    </div>
+    <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">Precisa instalar alguma coisa? <span class="faq-arrow">▼</span></button><div class="faq-a">Não! O MotoristaApp é um app web. Acesse pelo link, crie sua conta e adicione à tela inicial do celular. Funciona igual a um app normal, sem ocupar espaço.</div></div>
+    <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">Funciona no iPhone e Android? <span class="faq-arrow">▼</span></button><div class="faq-a">Sim! Funciona em qualquer celular, tablet ou computador. Android, iPhone, iPad — tudo. Seus dados ficam sincronizados em todos os dispositivos.</div></div>
+    <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">Como funciona o período de teste? <span class="faq-arrow">▼</span></button><div class="faq-a">Você tem 15 dias para usar todas as funcionalidades gratuitamente, sem precisar cadastrar cartão. Após os 15 dias, você decide se quer continuar com R$12,90/mês.</div></div>
+    <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">Posso cancelar quando quiser? <span class="faq-arrow">▼</span></button><div class="faq-a">Sim! Cancele com um clique, sem burocracia, sem multa e sem precisar ligar para ninguém. Seus dados ficam disponíveis até o fim do período pago.</div></div>
+    <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">Quais formas de pagamento aceita? <span class="faq-arrow">▼</span></button><div class="faq-a">Cartão de crédito, Google Pay, Apple Pay e Pix. Escolha o que for mais cômodo para você.</div></div>
+    <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">Meus dados ficam seguros? <span class="faq-arrow">▼</span></button><div class="faq-a">Sim! Seus dados ficam salvos na nuvem com criptografia e segurança de nível bancário. Você pode fazer backup e restaurar a qualquer momento.</div></div>
+    <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">Funciona com qual app de corrida? <span class="faq-arrow">▼</span></button><div class="faq-a">Com todos! Uber, 99, InDriver, Cabify e qualquer outro. Você configura a comissão de cada plataforma e o app calcula tudo automaticamente.</div></div>
   </div>
 </section>
+
+<div class="cta-final">
+  <h2 class="sec-title">Descubra quanto sobra<br/>de verdade no seu bolso.</h2>
+  <p class="sec-sub">15 dias grátis pra você sentir a diferença na prática.</p>
+  <a href="https://pay.cakto.com.br/36ewtox_915941" class="btn-cta">Começar agora</a>
+  <p style="font-size:12.5px;color:#bcd9cc;margin-top:16px">Sem cartão · 15 dias grátis · R$12,90/mês após o teste</p>
 </div>
 
-<!-- ══ CTA FINAL ══ -->
-<div class="cta-final fade-in">
-  <div style="max-width:600px;margin:0 auto;padding:0 20px">
-    <div style="font-size:52px;margin-bottom:20px">🚘</div>
-    <h2 style="font-family:'Syne',sans-serif;font-size:clamp(28px,5vw,44px);font-weight:900;line-height:1.1;letter-spacing:-1px;margin-bottom:16px">Pare de adivinhar.<br/>Comece a controlar.</h2>
-    <p style="font-size:17px;color:var(--sub);line-height:1.65;margin-bottom:36px">Você trabalha duro todo dia. Merece saber exatamente o que está ganhando. Com R$12,90 por mês, você tem controle total do seu dinheiro.</p>
-    <a href="https://app.cakto.com.br/SEU_LINK_AQUI" class="btn-cta" style="font-size:17px;padding:18px 44px">
-      🚀 Começar agora — 15 dias grátis
-    </a>
-    <p style="font-size:13px;color:var(--muted);margin-top:16px">Sem cartão de crédito · Cancele quando quiser · R$12,90/mês após o teste</p>
-  </div>
-</div>
-
-<!-- ══ FOOTER ══ -->
 <footer>
   <p>© 2026 MotoristaApp · Todos os direitos reservados</p>
-  <p style="margin-top:8px">Feito para motoristas brasileiros 🇧🇷</p>
+  <p style="margin-top:7px"><a href="/politica-privacidade.html">Política de Privacidade</a> · <a href="/termos-de-uso.html">Termos de Uso</a> · <a href="mailto:contato.motoristaaapp@gmail.com">Contato</a></p>
+  <p style="margin-top:7px;font-size:11.5px">Feito para motoristas brasileiros 🇧🇷</p>
 </footer>
 
-<!-- ══ STICKY CTA MOBILE ══ -->
-<div class="sticky-cta">
+<div class="sticky">
   <div class="sticky-inner">
-    <div><div class="sticky-price">R$12,90<span style="font-size:12px;font-weight:400;color:var(--muted)">/mês</span></div><div class="sticky-sub">15 dias grátis · sem cartão</div></div>
-    <button class="sticky-btn" onclick="document.getElementById('assinar').scrollIntoView({behavior:'smooth'})">Começar grátis →</button>
+    <div><div class="sticky-price">R$12,90<span style="font-size:11px;font-weight:400;color:var(--muted)">/mês</span></div><div class="sticky-sub">15 dias grátis · sem cartão</div></div>
+    <button class="sticky-btn" onclick="document.getElementById('assinar').scrollIntoView({behavior:'smooth'})">Ver planos →</button>
   </div>
 </div>
 
 <script>
-  // FAQ toggle
-  function toggleFaq(btn) {
-    const item = btn.closest('.faq-item');
-    item.classList.toggle('open');
-  }
+function toggleFaq(btn){btn.closest('.faq-item').classList.toggle('open');}
 
-  // Plano toggle
-  let planoAtual = "mensal";
-  function togglePlano() {
-    planoAtual = planoAtual === "mensal" ? "anual" : "mensal";
-    document.getElementById("plano-mensal").style.display = planoAtual === "mensal" ? "block" : "none";
-    document.getElementById("plano-anual").style.display = planoAtual === "anual" ? "block" : "none";
-    document.getElementById("lbl-mensal").style.color = planoAtual === "mensal" ? "#f1f5f9" : "#64748b";
-    document.getElementById("lbl-anual").style.color = planoAtual === "anual" ? "#f1f5f9" : "#64748b";
-    document.getElementById("toggle-ball").style.left = planoAtual === "anual" ? "29px" : "3px";
-    document.getElementById("toggle-ball").style.background = planoAtual === "anual" ? "#22c55e" : "#64748b";
-    document.getElementById("toggle-plano").style.background = planoAtual === "anual" ? "#064e3b" : "#1e293b";
-  }
+function fmtR(v){return 'R$'+v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});}
 
-  // Scroll animations
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); } });
-  }, { threshold: 0.1 });
-  document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+function calcSync(origin){
+  const numEl=document.getElementById('calcBruto');
+  const rangeEl=document.getElementById('calcRange');
+  if(origin==='range')numEl.value=rangeEl.value;
+  else rangeEl.value=Math.min(Math.max(numEl.value,0),600);
+  calcUpdate();
+}
 
-  // Animate numbers
-  function animateNum(el, target, prefix = '', suffix = '') {
-    let start = 0;
-    const duration = 2000;
-    const step = (timestamp) => {
-      if (!start) start = timestamp;
-      const progress = Math.min((timestamp - start) / duration, 1);
-      const ease = 1 - Math.pow(1 - progress, 3);
-      el.textContent = prefix + (typeof target === 'number' ? Math.floor(ease * target).toLocaleString('pt-BR') : target) + suffix;
-      if (progress < 1) requestAnimationFrame(step);
-    };
-    requestAnimationFrame(step);
-  }
+function calcUpdate(){
+  const bruto=parseFloat(document.getElementById('calcBruto').value)||0;
+  const comissao=bruto*0.25;
+  const combustivel=bruto*0.08;
+  const manut=bruto*0.05;
+  const liquido=Math.max(bruto-comissao-combustivel-manut,0);
+  document.getElementById('valComissao').textContent='-'+fmtR(comissao);
+  document.getElementById('valCombustivel').textContent='-'+fmtR(combustivel);
+  document.getElementById('valManut').textContent='-'+fmtR(manut);
+  document.getElementById('valLiquido').textContent=fmtR(liquido);
+  document.getElementById('pctLiquido').textContent=(bruto>0?Math.round(liquido/bruto*100):0)+'%';
+}
+calcUpdate();
 </script>
 </body>
 </html>
